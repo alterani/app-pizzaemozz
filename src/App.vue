@@ -54,6 +54,24 @@
             }}</v-list-item-title>
           </v-list-item-content>
         </v-list-item>
+
+        <v-list-item
+          active-class="sonoattivo"
+          class="enritostile"
+          color="white"
+          :to="test2.to"
+          link
+        >
+          <v-list-item-icon>
+            <v-icon class="white--text">{{ test2.icon }}</v-icon>
+          </v-list-item-icon>
+
+          <v-list-item-content>
+            <v-list-item-title class="white--text">{{
+              test2.title
+            }}</v-list-item-title>
+          </v-list-item-content>
+        </v-list-item>
       </v-list>
     </v-navigation-drawer>
 
@@ -96,6 +114,7 @@ export default {
       },
     ],
     test: { title: "TEST-Sviluppo", icon: "mdi-dev-to", to: "/test" },
+    test2: { title: "TEST-Sviluppo2", icon: "mdi-dev-to", to: "/test2" },
   }),
 };
 </script>
@@ -106,5 +125,8 @@ export default {
 }
 .sonoattivo {
   background: #f9aa33;
+}
+#inspire {
+  background: #f1f7f9;
 }
 </style>
