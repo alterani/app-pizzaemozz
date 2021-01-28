@@ -169,8 +169,4 @@ export default {
   },
 };
 </script>
-<style scoped>
-.quantOrdinata {
-  /* background: #cbf0e5;*/
-}
-</style>
+<style scoped></style>
