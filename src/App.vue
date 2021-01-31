@@ -1,6 +1,6 @@
 <template>
   <v-app id="inspire">
-    <v-navigation-drawer v-model="drawer" app class="primary">
+    <v-navigation-drawer v-if="loggedIn" v-model="drawer" app class="primary">
       <v-list-item class="primary">
         <v-list-item-content>
           <v-list-item-title class="title white--text">
@@ -15,27 +15,34 @@
       <v-divider></v-divider>
 
       <v-list dense nav>
-        <v-list-item
-          active-class="sonoattivo"
-          class="enritostile"
-          color="white"
-          v-for="item in items"
-          :key="item.title"
-          :to="item.to"
-          link
-        >
-          <v-list-item-icon>
-            <v-icon class="white--text">{{ item.icon }}</v-icon>
-          </v-list-item-icon>
+        <div v-for="item in items" :key="item.title">
+          <v-list-item
+            active-class="sonoattivo"
+            class="enritostile"
+            color="white"
+            :to="item.to"
+            link
+            v-if="
+              item.visibileatutti ||
+                (loggedIn &&
+                  (item.comletatoSviluppo ||
+                    maillUser == 'e.alterani@gmail.com'))
+            "
+          >
+            <v-list-item-icon>
+              <v-icon class="white--text">{{ item.icon }}</v-icon>
+            </v-list-item-icon>
 
-          <v-list-item-content>
-            <v-list-item-title class="white--text">{{
-              item.title
-            }}</v-list-item-title>
-          </v-list-item-content>
-        </v-list-item>
-
-        <v-divider></v-divider>
+            <v-list-item-content>
+              <v-list-item-title class="white--text">{{
+                item.title
+              }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
+        </div>
+        <v-divider
+          v-if="loggedIn && maillUser == 'e.alterani@gmail.com'"
+        ></v-divider>
 
         <v-list-item
           active-class="sonoattivo"
@@ -43,6 +50,7 @@
           color="white"
           :to="test.to"
           link
+          v-if="loggedIn && maillUser == 'e.alterani@gmail.com'"
         >
           <v-list-item-icon>
             <v-icon class="white--text">{{ test.icon }}</v-icon>
@@ -61,6 +69,7 @@
           color="white"
           :to="test2.to"
           link
+          v-if="loggedIn && maillUser == 'e.alterani@gmail.com'"
         >
           <v-list-item-icon>
             <v-icon class="white--text">{{ test2.icon }}</v-icon>
@@ -79,6 +88,7 @@
       <v-app-bar-nav-icon
         class="white--text enritostile"
         @click="drawer = !drawer"
+        v-if="loggedIn"
       ></v-app-bar-nav-icon>
 
       <v-toolbar-title>Pizza e Mozzarella</v-toolbar-title>
@@ -92,8 +102,24 @@
 </template>
 
 <script>
+import firebase from "firebase/app";
+import "firebase/auth";
 export default {
+  created() {
+    firebase.auth().onAuthStateChanged((user) => {
+      if (user) {
+        this.maillUser = firebase.auth().currentUser.email;
+        firebase.auth().currentUser.metadata;
+        this.loggedIn = true;
+      } else {
+        this.maillUser = "";
+        this.loggedIn = false;
+      }
+    });
+  },
   data: () => ({
+    maillUser: "",
+    loggedIn: false,
     drawer: null,
     items: [
       { title: "Dashboard", icon: "mdi-view-dashboard", to: "/" },
@@ -101,16 +127,30 @@ export default {
         title: "Prenota Mozzarella",
         icon: "mdi-map-clock",
         to: "/ordinemozzarella",
+        visibileatutti: false,
+        comletatoSviluppo: true,
       },
+
       {
         title: "Vedi ordini",
         icon: "mdi-order-alphabetical-ascending",
         to: "/listaordini",
+        protetto: false,
+        comletatoSviluppo: false,
       },
       {
         title: "Fai un ordine",
         icon: "mdi-book-plus-multiple-outline",
         to: "/nuovoordine",
+        protetto: false,
+        comletatoSviluppo: false,
+      },
+      {
+        title: "Esci",
+        icon: "mdi-logout",
+        to: "/logout",
+        protetto: false,
+        comletatoSviluppo: true,
       },
     ],
     test: { title: "TEST-Sviluppo", icon: "mdi-dev-to", to: "/test" },

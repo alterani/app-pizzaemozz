@@ -398,7 +398,7 @@ export default {
     },
     inviaOrdine: function() {
       this.snackbar = true;
-      console.log("\n..........................");
+      console.log("\n.................................");
       console.log("Nome : " + this.nomeCliente);
       console.log("Telefono : " + this.telefonoCliente);
       console.log("Data Consegna : " + this.select);
