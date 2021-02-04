@@ -8,71 +8,15 @@
 
         <v-spacer></v-spacer>
       </v-toolbar>
-
-      <v-list>
-        <template v-for="(item, index) in items">
-          <v-subheader
-            v-if="item.header"
-            :key="item.header"
-            v-text="item.header"
-          ></v-subheader>
-
-          <v-divider
-            v-else-if="item.divider"
-            :key="index"
-            :inset="item.inset"
-          ></v-divider>
-
-          <v-list-item
-            v-bind:class="{ quantOrdinata: item.quantita }"
-            @click="selezioneProdotto(item)"
-            v-else
-            :key="item.title"
-          >
-            <v-badge
-              :content="item.quantita + ' Pz'"
-              :value="item.quantita"
-              color="secondary"
-              left
-              overlap
-              ><v-list-item-avatar>
-                <v-icon v-if="item.quantita" color="black">
-                  mdi-book-open</v-icon
-                >
-                <v-icon v-else> mdi-book-open</v-icon>
-                <!-- <v-img :src="item.avatar"></v-img> -->
-              </v-list-item-avatar>
-            </v-badge>
-
-            <v-list-item-content>
-              <v-list-item-title
-                v-bind:class="{ 'font-weight-bold': item.quantita }"
-                v-html="item.title"
-              ></v-list-item-title>
-              <!--
-            <v-list-item-subtitle
-              v-bind:class="{ 'font-weight-bold': item.quantita }"
-              v-html="item.subtitle"
-            ></v-list-item-subtitle> -->
-            </v-list-item-content>
-
-            <v-list-item-action>
-              <v-icon
-                v-if="item.quantita"
-                color="#B00020"
-                small
-                @click="cancellOrdine(item)"
-              >
-                mdi-bookmark-remove
-              </v-icon>
-            </v-list-item-action>
-          </v-list-item>
-        </template>
-      </v-list>
     </v-card>
+    <v-btn @click="addRecord">INSERT DATI</v-btn>
   </div>
 </template>
 <script>
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+
 export default {
   data: () => ({
     dattto: 0,
@@ -150,6 +94,21 @@ export default {
     ],
   }),
   methods: {
+    addRecord: function() {
+      firebase
+        .firestore()
+        .collection("Ordini")
+        .add({
+          nomeclient: "Enrico5",
+          prodotti: {
+            data: new Date(),
+            mozzarella: Math.trunc(Math.random() * 100),
+            pane: Math.trunc(Math.random() * 100),
+            creatoDa: firebase.auth().currentUser.uid,
+          },
+        });
+      alert("call addRecod");
+    },
     stampaLog: function name(params) {
       console.log(this.$vuetify.breakpoint);
     },

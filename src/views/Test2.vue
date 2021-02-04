@@ -185,15 +185,15 @@
       </v-form>
       <!--Fine form -->
 
-      <!-- INIZIO SNACkBAR-->
+      <!-- INIZIO SNACkBAR SUCCESS-->
       <v-snackbar
         vertical
         centered
-        color="success"
+        :color="messaggioSnackbar.colore"
         v-model="snackbar"
         :timeout="timeout"
       >
-        <h3 class="white--text">Ordine trasmesso correttamente!</h3>
+        <h3 class="white--text">{{ messaggioSnackbar.testo }}</h3>
 
         <template v-slot:action="{ attrs }">
           <v-btn color="white" text v-bind="attrs" @click="snackbar = false">
@@ -206,9 +206,17 @@
   </div>
 </template>
 <script>
+import firebase from "firebase/app";
+import "firebase/auth";
+import "firebase/firestore";
+
 export default {
   data: () => ({
     snackbar: false,
+    messaggioSnackbar: {
+      colore: "",
+      testo: "",
+    },
     timeout: 3000,
     nomeCliente: "",
     telefonoCliente: "",
@@ -397,18 +405,44 @@ export default {
       });
     },
     inviaOrdine: function() {
-      this.snackbar = true;
-      console.log("\n.................................");
-      console.log("Nome : " + this.nomeCliente);
-      console.log("Telefono : " + this.telefonoCliente);
-      console.log("Data Consegna : " + this.select);
-      console.log("----------------------------------");
-      console.log("Quantita" + "\t" + "Prodotto ");
+      let ordine = {
+        dataOrdine: new Date(),
+        nomeCliente: this.nomeCliente,
+        telefonoCliente: this.telefonoCliente,
+        dataConsegna: this.select,
+        righeordine: [],
+      };
+
       this.cardSelezionate.map(function(singol) {
-        console.log(singol.qtn + "\t\t\t" + singol.title + " " + singol.label);
+        ordine.righeordine.push({
+          quantita: singol.qtn,
+          descrizioneProdotto: singol.title + " " + singol.label,
+        });
       });
-      console.log("----------------------------------");
-      this.resetOrdine();
+
+      firebase
+        .firestore()
+        .collection("Ordini")
+        .add(ordine)
+        .then(
+          (res) => {
+            //ordine creato correttamente
+            console.log("Creato Ordine numero: ", res.id);
+            if (res.id) {
+              this.messaggioSnackbar.colore = "success";
+              this.messaggioSnackbar.testo = "Ordine Trasmesso Correttamente!";
+              this.snackbar = true;
+              this.resetOrdine();
+            }
+          },
+          (err) => {
+            //gestione errore promise firebase
+            this.messaggioSnackbar.colore = "error";
+            this.messaggioSnackbar.testo = "Errore durante invio ordine!";
+            this.snackbar = true;
+            console.log(err);
+          }
+        );
     },
     cambiacolore: function(parametro) {
       if (parametro) {

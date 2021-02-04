@@ -11,7 +11,7 @@ import firebaseConfig from "./configFirebase.js";
 Vue.prototype.$axios = axios;
 Vue.config.productionTip = false;
 
-console.log("configFirebase = ", firebaseConfig);
+//console.log("configFirebase = ", firebaseConfig);
 
 firebase.initializeApp(firebaseConfig);
 
