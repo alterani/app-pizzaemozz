@@ -169,6 +169,36 @@
           ref="selectDate"
         ></v-select>
 
+        <!--INIZIO DATE PICKER-->
+        <v-menu
+          v-model="menu2"
+          :close-on-content-click="false"
+          :nudge-right="40"
+          transition="scale-transition"
+          offset-y
+          min-width="auto"
+        >
+          <template v-slot:activator="{ on, attrs }">
+            <v-text-field
+              v-model="date"
+              label="Seleziona una data"
+              prepend-icon="mdi-calendar"
+              readonly
+              v-bind="attrs"
+              v-on="on"
+            ></v-text-field>
+          </template>
+          <v-date-picker
+            v-model="date"
+            @input="menu2 = false"
+            :allowed-dates="disablePastDates"
+            :events="functionEvents"
+            locale="it-IT"
+            first-day-of-week="1"
+          ></v-date-picker>
+        </v-menu>
+        <!--FINE DATE PICKER  -->
+
         <v-btn
           :disabled="
             !select ||
@@ -212,6 +242,9 @@ import "firebase/firestore";
 
 export default {
   data: () => ({
+    //date: new Date().toISOString().substr(0, 10),
+    date: "",
+    menu2: false,
     snackbar: false,
     messaggioSnackbar: {
       colore: "",
@@ -390,6 +423,44 @@ export default {
     },
   },
   methods: {
+    disablePastDates(val) {
+      let prossimoOrdineDisponibile = new Date();
+      prossimoOrdineDisponibile.setDate(
+        prossimoOrdineDisponibile.getDate() + 2
+      );
+
+      while (
+        prossimoOrdineDisponibile.getDay() != 2 &&
+        prossimoOrdineDisponibile.getDay() != 4 &&
+        prossimoOrdineDisponibile.getDay() != 6
+      ) {
+        prossimoOrdineDisponibile.setDate(
+          prossimoOrdineDisponibile.getDate() + 1
+        );
+      }
+
+      // Adatto il gtg local time
+      prossimoOrdineDisponibile.setHours(
+        prossimoOrdineDisponibile.getHours() + 1
+      );
+      return val >= prossimoOrdineDisponibile.toISOString().substr(0, 10);
+    },
+    functionEvents(date) {
+      var datacorrente = new Date(date);
+      var adesso = new Date();
+      var giorno_settimana = datacorrente.getDay();
+      var diffInGiorni = (datacorrente - adesso) / (1000 * 3600 * 24);
+
+      if (
+        (giorno_settimana === 2 ||
+          giorno_settimana == 4 ||
+          giorno_settimana == 6) &&
+        date > new Date().toISOString().substr(0, 10) &&
+        diffInGiorni > 1
+      )
+        return ["cyan"];
+      return false;
+    },
     resetOrdine: function() {
       this.cards.forEach(function(singolaCard) {
         singolaCard.qtn = 0;
