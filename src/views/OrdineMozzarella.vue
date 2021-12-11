@@ -209,6 +209,7 @@
 import firebase from "firebase/app";
 import "firebase/auth";
 import "firebase/firestore";
+import elencoProssimeDateDiConsegna from "../finzioni-custom";
 
 export default {
   data: () => ({
@@ -226,12 +227,7 @@ export default {
     bottoneSelezionato: null,
     active: false,
     select: null,
-    elencoDate: [
-      "02-Febbraio Martedi",
-      "04-Febbraio Giovedi",
-      "06-Febbraio Sabato",
-      "09-Febbraio Martedi",
-    ],
+    elencoDate: elencoProssimeDateDiConsegna(),
     cards: [
       {
         id: "100",
@@ -405,11 +401,17 @@ export default {
       });
     },
     inviaOrdine: function() {
+      let parmDatadaformattare = this.select;
+      let dataformattata = elencoProssimeDateDiConsegna(parmDatadaformattare);
+      let appDataOra = new Date(dataformattata);
       let ordine = {
         dataOrdine: new Date(),
         nomeCliente: this.nomeCliente,
         telefonoCliente: this.telefonoCliente,
-        dataConsegna: this.select,
+        //dataConsegna: this.select,
+        dataConsegna: appDataOra,
+        consegnatoalcliente: false,
+        ordinetrasmessoalcaseificio: false,
         righeordine: [],
       };
 
@@ -473,7 +475,6 @@ export default {
       }
     },
     sommaQuantita: function(operatore = "piu", scheda) {
-      //console.log(scheda.qtn);
       if (operatore === "piu") {
         scheda.qtn -= 1;
         scheda.qtn += 2;
@@ -485,9 +486,7 @@ export default {
     },
   },
   watch: {
-    quantita: function(newQuantita, oldQuantita) {
-      //console.log("newQuantita = " + newQuantita);
-    },
+    quantita: function(newQuantita, oldQuantita) {},
   },
 };
 </script>

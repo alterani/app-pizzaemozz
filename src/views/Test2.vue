@@ -159,16 +159,6 @@
           required
         ></v-text-field>
 
-        <v-select
-          class="textInputOrdine"
-          v-model="select"
-          :items="elencoDate"
-          :rules="[(v) => !!v || 'Inserisci Data']"
-          label="Data consegna"
-          required
-          ref="selectDate"
-        ></v-select>
-
         <!--INIZIO DATE PICKER-->
         <v-menu
           v-model="menu2"
@@ -201,7 +191,7 @@
 
         <v-btn
           :disabled="
-            !select ||
+            !date ||
               !nomeCliente ||
               !telefonoCliente ||
               !cardSelezionate.length > 0
@@ -259,12 +249,7 @@ export default {
     bottoneSelezionato: null,
     active: false,
     select: null,
-    elencoDate: [
-      "02-Febbraio Martedi",
-      "04-Febbraio Giovedi",
-      "06-Febbraio Sabato",
-      "09-Febbraio Martedi",
-    ],
+
     cards: [
       {
         id: "100",
@@ -419,6 +404,9 @@ export default {
   }),
   computed: {
     cardSelezionate: function() {
+      if (this.filtraQuantita().length == 0) {
+        this.date = "";
+      }
       return this.filtraQuantita();
     },
   },
@@ -467,8 +455,7 @@ export default {
       });
       this.nomeCliente = "";
       this.telefonoCliente = "";
-      this.select = null;
-      this.$refs["selectDate"].reset();
+      this.date = "";
     },
     filtraQuantita: function() {
       return this.cards.filter(function(card) {
@@ -616,7 +603,7 @@ export default {
   margin: 10px;
   padding-top: 4px;
 
-  height: 200px;
+  height: 225px;
   border-style: solid;
   border-width: 2px;
   border-color: rgb(123, 123, 123);

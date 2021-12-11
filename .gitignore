@@ -2,10 +2,13 @@
 node_modules
 /dist
 
+# CONFIGURAZIONE FIREBASE
+configFirebase.js
 
 # local env files
 .env.local
 .env.*.local
+
 
 # Log files
 npm-debug.log*
