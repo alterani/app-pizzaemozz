@@ -7,7 +7,7 @@
             Pizza&Mozz
           </v-list-item-title>
           <v-list-item-subtitle class="grey--text">
-            Amministratore
+            {{ maillUser }}
           </v-list-item-subtitle>
         </v-list-item-content>
       </v-list-item>
@@ -26,6 +26,7 @@
               item.visibileatutti ||
                 (loggedIn &&
                   (item.comletatoSviluppo ||
+                    (item.visibilealRistorante && profiloRistorante) ||
                     maillUser == 'e.alterani@gmail.com'))
             "
           >
@@ -104,6 +105,7 @@
 <script>
 import firebase from "firebase/app";
 import "firebase/auth";
+import "firebase/firestore";
 export default {
   created() {
     firebase.auth().onAuthStateChanged((user) => {
@@ -111,24 +113,45 @@ export default {
         this.maillUser = firebase.auth().currentUser.email;
         firebase.auth().currentUser.metadata;
         this.loggedIn = true;
+
+        firebase
+          .firestore()
+          .collection("permessi")
+          .where("utente", "==", this.maillUser)
+          .get()
+          .then((queruSanpshot) => {
+            queruSanpshot.forEach((doc) => {
+              //console.log(doc.data());
+              this.profiloRistorante = doc.data().ristorante;
+            });
+          });
       } else {
         this.maillUser = "";
         this.loggedIn = false;
       }
     });
-  },
+  }, // fine created
   data: () => ({
     maillUser: "",
+    profiloRistorante: "",
     loggedIn: false,
     drawer: null,
     items: [
-      { title: "Dashboard", icon: "mdi-view-dashboard", to: "/" },
+      {
+        title: "Dashboard",
+        icon: "mdi-view-dashboard",
+        to: "/",
+        visibileatutti: false,
+        comletatoSviluppo: false,
+        visibilealRistorante: false,
+      },
       {
         title: "Prenota Mozzarella",
         icon: "mdi-map-clock",
         to: "/ordinemozzarella",
         visibileatutti: false,
-        comletatoSviluppo: true,
+        comletatoSviluppo: false,
+        visibilealRistorante: true,
       },
 
       {
@@ -137,6 +160,7 @@ export default {
         to: "/listaordini",
         protetto: false,
         comletatoSviluppo: false,
+        visibilealRistorante: true,
       },
       {
         title: "Fai un ordine",
@@ -144,6 +168,7 @@ export default {
         to: "/nuovoordine",
         protetto: false,
         comletatoSviluppo: false,
+        visibilealRistorante: false,
       },
       {
         title: "Esci",
@@ -151,6 +176,7 @@ export default {
         to: "/logout",
         protetto: false,
         comletatoSviluppo: true,
+        visibilealRistorante: false,
       },
     ],
     test: { title: "TEST-Sviluppo", icon: "mdi-dev-to", to: "/test" },
