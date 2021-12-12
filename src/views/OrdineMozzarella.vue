@@ -413,6 +413,7 @@ export default {
         consegnatoalcliente: false,
         ordinetrasmessoalcaseificio: false,
         righeordine: [],
+        ristorante: firebase.auth().currentUser.email,
       };
 
       this.cardSelezionate.map(function(singol) {

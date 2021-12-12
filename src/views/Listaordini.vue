@@ -1,6 +1,6 @@
 <template>
   <div class="about">
-    <h1>Pagina Lista Ordini</h1>
+    <h1>Elenco Ordini</h1>
     <v-btn color="success" class="bottoni mr-4 mt-5" @click="leggiOrdini">
       <v-icon>
         mdi-refresh
@@ -105,9 +105,14 @@ export default {
     }, // fine formattaData
     leggiOrdini: function() {
       var elencomio = [];
+
       const ordini = firebase
         .firestore()
         .collection("Ordini")
+        // .where("ristorante", "in", [
+        //   firebase.auth().currentUser.email,
+        //   "e.alterani@gmail.com",
+        // ])
         .orderBy("dataConsegna")
         .get()
         .then((queruSanpshot) => {
@@ -115,8 +120,13 @@ export default {
           queruSanpshot.forEach((doc) => {
             //console.log(doc.id);
             //console.log(doc.data());
-            elencomio.push({ id: doc.id, ordine: doc.data() });
-            this.listaOrdini.push({ id: doc.id, ordine: doc.data() });
+            if (
+              firebase.auth().currentUser.email == "e.alterani@gmail.com" ||
+              firebase.auth().currentUser.email == doc.data().ristorante
+            ) {
+              elencomio.push({ id: doc.id, ordine: doc.data() });
+              this.listaOrdini.push({ id: doc.id, ordine: doc.data() });
+            }
           });
         });
       //this.listaOrdini = elencomio;
